@@ -1,6 +1,6 @@
 # %% [markdown]
-# # Título del proyecto
-# Integrantes: Nombre A, Nombre B
+# # Analisis estadístico y correlacional de datos médicos en pacientes con VIH
+# Integrantes: Juan Pablo Matiz, Matias Nuñez Piragauta
 
 # %%
 #%%
