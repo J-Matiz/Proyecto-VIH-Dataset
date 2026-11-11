@@ -420,7 +420,142 @@ plt.tight_layout()
 plt.show()
 # %% [markdown]
 # ## 3. Identificación de outliers  (Integrante A)
+# %%
+# Identificación de outliers mediante el método IQR
 
+# Q1 = percentil 25, Q3 = percentil 75, IQR = rango intercuartílico
+
+
+
+variables_numericas = df.select_dtypes(include=[np.number]).columns.tolist()
+
+
+
+resumen_outliers = []
+
+
+
+for var in variables_numericas:
+
+    Q1 = df[var].quantile(0.25)
+
+    Q3 = df[var].quantile(0.75)
+
+    IQR = Q3 - Q1
+
+    limite_inferior = Q1 - 1.5 * IQR
+
+    limite_superior = Q3 + 1.5 * IQR
+
+
+
+    n_outliers = ((df[var] < limite_inferior) | (df[var] > limite_superior)).sum()
+
+    pct_outliers = (n_outliers / df[var].count() * 100).round(2)
+
+
+
+    resumen_outliers.append({
+
+        'Variable': var,
+
+        'Q1': round(Q1, 2),
+
+        'Q3': round(Q3, 2),
+
+        'IQR': round(IQR, 2),
+
+        'Límite Inferior': round(limite_inferior, 2),
+
+        'Límite Superior': round(limite_superior, 2),
+
+        'N Outliers': n_outliers,
+
+        'Pct Outliers': pct_outliers
+
+    })
+
+
+
+resumen_outliers = pd.DataFrame(resumen_outliers).sort_values('Pct Outliers', ascending=False)
+
+
+
+display(
+
+    resumen_outliers.style
+
+    .background_gradient(subset=['Pct Outliers'], cmap='Reds')
+
+    .format({'Pct Outliers': '{:.2f}%'})
+
+    .set_caption('Detección de Outliers por Variable — Método IQR')
+
+)
+
+# Filtramos únicamente variables con porcentaje de outliers superior al 5%
+
+# para enfocarnos en las que requieren atención real
+
+
+
+variables_con_outliers = resumen_outliers[
+
+    resumen_outliers['Pct Outliers'] > 5
+
+]['Variable'].tolist()
+
+
+
+fig, axes = plt.subplots(
+
+    nrows=len(variables_con_outliers),
+
+    ncols=1,
+
+    figsize=(10, len(variables_con_outliers) * 3)
+
+)
+
+
+
+# Manejo del caso donde solo hay una variable
+
+if len(variables_con_outliers) == 1:
+
+    axes = [axes]
+
+
+
+for i, var in enumerate(variables_con_outliers):
+
+    axes[i].boxplot(
+
+        df[var].dropna(),
+
+        vert=False,
+
+        patch_artist=True,
+
+        boxprops=dict(facecolor='#a8d5e2'),
+
+        medianprops=dict(color='darkred', linewidth=2)
+
+    )
+
+    axes[i].set_title(f'{var}', fontsize=10)
+
+    axes[i].set_xlabel('Valor')
+
+
+
+plt.suptitle('Boxplots — Variables con Outliers Significativos (>5%)',
+
+             fontsize=13, y=1.01)
+
+plt.tight_layout()
+
+plt.show()
 # %% [markdown]
 # ## 4. Valores inconsistentes y duplicados  (Integrante B)
 
