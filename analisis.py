@@ -2,7 +2,6 @@
 # # Analisis estadístico y correlacional de datos médicos en pacientes con VIH
 # Integrantes: Juan Pablo Matiz, Matias Nuñez Piragauta
 
-# %%
 #%%
 %pip install --break-system-packages pandas numpy matplotlib seaborn openpyxl jinja2
 import pandas as pd
@@ -175,9 +174,7 @@ cols_drop_high_nulls = [
 
 
 
-df.drop(columns=cols_drop_complex, inplace=True)
-
-print(f'Variables eliminadas: {len(cols_drop_high_nulls + cols_drop_redundant + cols_drop_complex)}')
+print(f'Variables eliminadas: {len(cols_drop_high_nulls)}')
 
 print(f'Variables restantes: {df.shape[1]}')
 
@@ -565,6 +562,27 @@ df = df.drop_duplicates()
 print(f'Duplicados restantes: {df.duplicated().sum()}')
 # %% [markdown]
 # ## 5. Creación de variables  (Integrante A)
+# %% [markdown]
+## Variables derivadas
+
+#Las siguientes variables se construyen después de la limpieza para convertir medidas individuales en indicadores que permitan comparar grupos de pacientes y estudiar su evolución clínica. No reemplazan las variables originales: las complementan.
+
+#- **AgeGroup:** agrupa `Age` en etapas de vida (menor de 18, 18-29, 30-44, 45-59 y 60 o más). Esto facilita comparar resultados clínicos por edad sin interpretar cada edad como una categoría independiente.
+#- **WeightChangeKg:** se calcula como `WeightAtLastVisit - WeightAtStart`. Permite identificar pérdida o ganancia de peso entre el inicio del tratamiento y la última visita; los valores negativos representan pérdida y los positivos ganancia.
+#- **Cd4Change:** se calcula como `MostRecentCd4Count - Cd4AtStart`. Resume la evolución inmunológica: un valor positivo indica aumento del conteo de CD4 y uno negativo indica disminución.
+#- **ImmuneStatusAtLastVisit:** clasifica el CD4 de la última visita en tres niveles: inmunidad severamente comprometida (menos de 200), comprometida (200-499) y favorable (500 o más). Así se puede estudiar la distribución del riesgo inmunológico.
+#- **ViralSuppressionStatus:** clasifica como suprimida una carga viral de hasta 50 copias/ml y como no suprimida una mayor de 50. Los registros con `ViralLoad_missing = 1` se mantienen como 'Sin medicion valida' para no confundir valores imputados con mediciones clínicas reales.
+
+#En conjunto, estas variables permiten relacionar edad, cambios antropométricos, recuperación inmunológica y control virológico para elaborar conclusiones más profundas.
+# %%
+df['AgeGroup'] = pd.cut(df['Age'], bins=[0, 17, 29, 44, 59, float('inf')], labels=['Menor de 18', '18-29', '30-44', '45-59', '60 o mas'], include_lowest=True)
+df['WeightChangeKg'] = df['WeightAtLastVisit'] - df['WeightAtStart']
+df['Cd4Change'] = df['MostRecentCd4Count'] - df['Cd4AtStart']
+df['ImmuneStatusAtLastVisit'] = pd.cut(df['MostRecentCd4Count'], bins=[-float('inf'), 199, 499, float('inf')], labels=['Inmunidad severamente comprometida', 'Inmunidad comprometida', 'Inmunidad favorable'])
+df['ViralSuppressionStatus'] = np.select([df['ViralLoad_missing'].eq(1), df['ViralLoad'].le(50)], ['Sin medicion valida', 'Suprimida (<=50 copias/ml)'], default='No suprimida (>50 copias/ml)')
+variables_derivadas = ['AgeGroup', 'WeightChangeKg', 'Cd4Change', 'ImmuneStatusAtLastVisit', 'ViralSuppressionStatus']
+display(df[variables_derivadas].head())
+print(f'Variables derivadas creadas: {len(variables_derivadas)}')
 
 # %% [markdown]
 # ## 6. Filtrado y condiciones en pandas  (Integrante B)
