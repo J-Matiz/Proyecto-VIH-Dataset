@@ -789,3 +789,10 @@ print(f"5. Barrera Física de Adherencia: Los pacientes que iniciaron postrados 
 #5. **El estado funcional inicial constituye una barrera para la adherencia:** los pacientes que ingresaron postrados o con mayor dependencia fisica muestran una mayor proporcion de adherencia deficiente que los pacientes activos. Esta conclusion se obtiene de la tabla cruzada normalizada entre `FunctionalStatusAtStart` y `ArvAdherenceLatestLevel`.
 
 #En conjunto, estas conclusiones se basan en el dataset previamente limpiado: se revisaron valores faltantes, se corrigieron variables clinicas y valores imposibles, y los valores extremos se recortaron al percentil 99 solo para mejorar la visualizacion.
+
+#%%
+27283	Tertiary hospital	Public	1987-05-04 00:00:00	32.0	Male	Married	Tertiary	2015-01-08 00:00:00	2015-08-01 00:00:00	OPD	...	Yes	Good	454.0	Yes	NaN	First-line Regimen	20.0	0	0	0
+27284	Secondary health facility	Public	15/6/1986	27.0	Female	Single	Missing	2014-05-09 00:00:00	2014-09-09 00:00:00	HTS	...	Yes	Good	396.0	No	Non-oregnancy	First-line Regimen	63.0	1	1	1
+27285	Tertiary hospital	Public	17/7/1982	35.0	Female	Married	Tertiary	2017-08-06 00:00:00	2017-08-06 00:00:00	HTS	...	Yes	Good	463.0	No	Non-oregnancy	First-line Regimen	63.0	0	0	1
+27286	Tertiary hospital	Public	1990-07-07 00:00:00	25.0	Female	Single	Secondary	2017-04-04 00:00:00	2017-04-04 00:00:00	TB-DOT	...	Yes	Good	396.0	No	Non-oregnancy	First-line Regimen	63.0	1	1	1
+27287	Secondary health facility	Private not for profit	15/6/1973	40.0	Male	Widowed	Primary	27/11/2013	2013-06-12 00:00:00	Others	...	No	Good	253.0	Yes	NaN	Unknown	63.0	1	0	
