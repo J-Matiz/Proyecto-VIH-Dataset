@@ -628,6 +628,60 @@ print(f"[Dato 5] El {cd4_bajo_terciario:.1f}% de los pacientes en hospitales de 
 # %% [markdown]
 # ## 7. Agrupación con groupby  (Integrante A)
 
+# %%
+# Resumenes agrupados para obtener conclusiones comparables entre subgrupos.
+resumen_edad = df.groupby('AgeGroup', observed=False).agg(
+    Pacientes=('Age', 'size'),
+    CD4_final_promedio=('MostRecentCd4Count', 'mean'),
+    Cambio_CD4_promedio=('Cd4Change', 'mean')
+).round(2)
+
+relacion_inmunidad_viral = (
+    pd.crosstab(
+        df['ImmuneStatusAtLastVisit'],
+        df['ViralSuppressionStatus'],
+        normalize='index'
+    ) * 100
+).round(2)
+
+resumen_regimen = df.groupby('CurrentRegimen', observed=False).agg(
+    Pacientes=('CurrentRegimen', 'size'),
+    Cambio_CD4_promedio=('Cd4Change', 'mean'),
+    Cambio_peso_promedio=('WeightChangeKg', 'mean')
+).round(2).sort_values('Cambio_CD4_promedio', ascending=False)
+
+resumen_estadio = df.groupby('ClinicalStageAtStart', observed=False).agg(
+    Pacientes=('ClinicalStageAtStart', 'size'),
+    Cambio_CD4_promedio=('Cd4Change', 'mean'),
+    Supresion_viral_pct=('ViralSuppressionStatus', lambda s: (s == 'Suprimida (<=50 copias/ml)').mean() * 100)
+).round(2).sort_values('Cambio_CD4_promedio')
+
+resumen_adherencia = df.groupby('ArvAdherenceLatestLevel', observed=False).agg(
+    Pacientes=('ArvAdherenceLatestLevel', 'size'),
+    CD4_final_promedio=('MostRecentCd4Count', 'mean'),
+    Supresion_viral_pct=('ViralSuppressionStatus', lambda s: (s == 'Suprimida (<=50 copias/ml)').mean() * 100),
+    Cambio_peso_promedio=('WeightChangeKg', 'mean')
+).round(2)
+
+display(resumen_edad)
+display(relacion_inmunidad_viral)
+display(resumen_regimen)
+display(resumen_estadio)
+display(resumen_adherencia)
+
+# %% [markdown]
+# ## Conclusiones obtenidas mediante `groupby`
+
+#1. **Diferencias por grupo etario:** el grupo de 60 años o más presenta el mayor cambio promedio de CD4 (852.92), mientras que el grupo de 45-59 años presenta un cambio promedio negativo (-72.73). Esto sugiere que la evolución inmunológica no es uniforme entre edades y que el grupo de 45-59 años requiere una revisión específica de sus registros y posibles factores clínicos.
+
+#2. **Estado inmunológico y supresión viral:** entre los pacientes con inmunidad favorable, el 15.4% aparece como suprimido, frente al 9.0% de quienes tienen inmunidad severamente comprometida. La relación es descriptiva y no prueba causalidad, pero indica que un mejor estado de CD4 tiende a coexistir con una mayor proporción de supresión viral.
+
+#3. **Regimen actual y recuperación de CD4:** los pacientes con régimen de primera línea presentan un cambio promedio de CD4 de 213.06, superior al registrado en los grupos con régimen desconocido (129.68) y de segunda línea (-1895.01). El valor extremo del régimen de segunda línea debe interpretarse con cautela porque su grupo es pequeño (371 pacientes) y puede estar afectado por valores atípicos.
+
+#4. **Estadio clínico al inicio:** los pacientes clasificados en estadio III presentan el mayor cambio promedio de CD4 (304.92), mientras que los de estadio II presentan 49.18. Esto muestra que el cambio observado no sigue necesariamente un orden lineal por estadio y debe analizarse junto con el tamaño de cada grupo y las condiciones clínicas iniciales.
+
+#5. **Adherencia y resultados clínicos:** el grupo con adherencia buena concentra la mayoría de los pacientes (23,268) y tiene el mayor CD4 final promedio (604.48), mientras que el grupo con adherencia pobre presenta un CD4 final promedio menor (356.40) y una menor proporción de supresión viral (4.60% frente a 12.51% en adherencia buena). Esta asociación respalda la importancia de la adherencia en el seguimiento, aunque no permite afirmar causalidad por sí sola.
+
 # %% [markdown]
 # ## 8. Visualizaciones  (Integrante B)
 
