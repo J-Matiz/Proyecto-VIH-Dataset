@@ -775,3 +775,17 @@ print(f"5. Barrera Física de Adherencia: Los pacientes que iniciaron postrados 
 
 # %% [markdown]
 # ## 9. Conclusiones finales  (Integrante A)
+
+## Conclusiones generales del analisis
+
+#1. **Ingreso tardio al tratamiento y deterioro inmunologico:** los bajos niveles de CD4 inicial indican que una parte importante de los pacientes comienza la atencion con un estado inmunologico avanzado. Esta conclusion se basa en la distribucion y la mediana de `Cd4AtStart`, despues de tratar los valores faltantes.
+
+#2. **Control virologico en los pacientes con mediciones disponibles:** la distribucion de `ViralLoad` sugiere control virologico en los pacientes evaluados. La conclusion se obtiene del analisis de la carga viral ya convertida y depurada, por lo que debe interpretarse junto con la existencia de registros faltantes.
+
+#3. **Brecha de seguimiento clinico:** la ausencia de pruebas recientes de carga viral representa un problema relevante de calidad y continuidad del seguimiento. Este hallazgo se identifica mediante el indicador de datos faltantes `ViralLoad_missing` y su proporcion dentro del total de pacientes.
+
+#4. **La adherencia se relaciona con mejores resultados inmunologicos:** los pacientes con adherencia `Good` presentan, en general, mayores niveles de CD4 reciente que quienes tienen adherencia `Poor`. Esta conclusion surge de la comparacion agrupada y del boxplot de `MostRecentCd4Count`; describe una asociacion y no demuestra causalidad.
+
+#5. **El estado funcional inicial constituye una barrera para la adherencia:** los pacientes que ingresaron postrados o con mayor dependencia fisica muestran una mayor proporcion de adherencia deficiente que los pacientes activos. Esta conclusion se obtiene de la tabla cruzada normalizada entre `FunctionalStatusAtStart` y `ArvAdherenceLatestLevel`.
+
+#En conjunto, estas conclusiones se basan en el dataset previamente limpiado: se revisaron valores faltantes, se corrigieron variables clinicas y valores imposibles, y los valores extremos se recortaron al percentil 99 solo para mejorar la visualizacion.
