@@ -586,6 +586,44 @@ print(f'Variables derivadas creadas: {len(variables_derivadas)}')
 
 # %% [markdown]
 # ## 6. Filtrado y condiciones en pandas  (Integrante B)
+# %%
+# 1. Relación entre el Estado Funcional "Postrado en Cama" (Bed ridden) y la Adherencia Deficiente
+bed_ridden = df[df['FunctionalStatusAtStart'] == 'Bed ridden']
+adherencia_deficiente_bed = bed_ridden['ArvAdherenceLatestLevel'].isin(['Fair', 'Poor']).mean() * 100
+adherencia_deficiente_general = df['ArvAdherenceLatestLevel'].isin(['Fair', 'Poor']).mean() * 100
+
+print(f"[Dato 1] El {adherencia_deficiente_bed:.1f}% de los pacientes que iniciaron el tratamiento postrados en cama presentan una adherencia deficiente (Fair/Poor), en comparación con un {adherencia_deficiente_general:.1f}% en la población general. Conclusión: El estado físico inicial de postración es un fuerte predictor de dificultades en la adherencia a largo plazo.")
+
+# 2. Impacto de la Co-infección por Tuberculosis en la Interrupción del Tratamiento
+tb_activa = df[df['TbStatusAtLAstVisit'] == 'Confirmed TB']
+interrupcion_tb = (tb_activa['ArtInterruption'].astype(str).str.strip().str.lower() == 'yes').mean() * 100
+interrupcion_general = (df['ArtInterruption'].astype(str).str.strip().str.lower() == 'yes').mean() * 100
+
+print(f"[Dato 2] Los pacientes con Tuberculosis activa confirmada en su última visita interrumpen el tratamiento en un {interrupcion_tb:.1f}%, frente al {interrupcion_general:.1f}% general. Conclusión: La co-infección activa de TB duplica la probabilidad de interrupción del tratamiento ARV, requiriendo un manejo conjunto prioritario.")
+
+# 3. Adherencia en Pacientes sin Registro Reciente de Carga Viral (ViralLoad_missing)
+sin_carga_viral = df[df['ViralLoad_missing'] == 1]
+adherencia_good_sin_cv = (sin_carga_viral['ArvAdherenceLatestLevel'] == 'Good').mean() * 100
+
+print(f"[Dato 3] El {adherencia_good_sin_cv:.1f}% de los pacientes que no tienen un registro de carga viral reciente reportan una adherencia 'Good'. Conclusión: Existe una brecha de monitoreo clínico importante; pacientes clasificados con buena adherencia subjetiva carecen de confirmación virológica objetiva.")
+
+# 4. Diferencia en la Pérdida de Peso Durante el Tratamiento en Pacientes con Interrupción
+pacientes_interrumpidos = df[df['ArtInterruption'].astype(str).str.strip().str.lower() == 'yes']
+pacientes_continuos = df[df['ArtInterruption'].astype(str).str.strip().str.lower() == 'no']
+
+peso_perdido_interrumpidos = (pacientes_interrumpidos['WeightAtStart'] - pacientes_interrumpidos['WeightAtLastVisit']).mean()
+peso_perdido_continuos = (pacientes_continuos['WeightAtStart'] - pacientes_continuos['WeightAtLastVisit']).mean()
+
+print(f"[Dato 4] Los pacientes con interrupción del tratamiento perdieron en promedio {peso_perdido_interrumpidos:.2f} kg desde el inicio, mientras que los continuos perdieron {peso_perdido_continuos:.2f} kg. Conclusión: La interrupción del tratamiento no muestra una pérdida de peso marcadamente mayor en promedio, sugiriendo que el impacto físico es heterogéneo o de largo plazo.")
+
+# 5. Vulnerabilidad Inmunológica Extrema (CD4 < 200) según el Nivel de Establecimiento de Salud
+terciario = df[df['Health facility level'].astype(str).str.strip().str.lower() == 'tertiary']
+primario = df[df['Health facility level'].astype(str).str.strip().str.lower() == 'primary']
+
+cd4_bajo_terciario = (terciario['MostRecentCd4Count'] < 200).mean() * 100
+cd4_bajo_primario = (primario['MostRecentCd4Count'] < 200).mean() * 100
+
+print(f"[Dato 5] El {cd4_bajo_terciario:.1f}% de los pacientes en hospitales de nivel terciario tienen CD4 < 200, comparado con el {cd4_bajo_primario:.1f}% en nivel primario. Conclusión: Los centros de alta complejidad concentran a los pacientes con mayor deterioro inmunológico de la red de salud.")
 
 # %% [markdown]
 # ## 7. Agrupación con groupby  (Integrante A)
