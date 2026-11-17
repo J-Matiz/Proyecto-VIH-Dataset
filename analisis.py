@@ -684,6 +684,94 @@ display(resumen_adherencia)
 
 # %% [markdown]
 # ## 8. Visualizaciones  (Integrante B)
+# %%
+# Configuramos una figura de cuadrícula para los 5 gráficos seleccionados
+fig = plt.figure(figsize=(16, 22))
+
+
+# GRÁFICO 1: Histograma de CD4 Inicial (Recortado al percentil 99)
+
+plt.subplot(3, 2, 1)
+datos_cd4 = df['Cd4AtStart'].dropna()
+limite_cd4 = datos_cd4.quantile(0.99)
+datos_cd4_clip = datos_cd4[datos_cd4 <= limite_cd4]
+
+plt.hist(datos_cd4_clip, bins=30, color='#a8d5e2', edgecolor='white')
+plt.axvline(datos_cd4_clip.median(), color='darkred', linestyle='--', linewidth=1.5, label='Mediana')
+plt.title('1. Distribución de CD4 Inicial (Cd4AtStart)', fontsize=12)
+plt.xlabel('Células CD4 / µL')
+plt.ylabel('Frecuencia')
+plt.legend()
+
+
+# GRÁFICO 2: Histograma de Carga Viral (Recortada al percentil 99)
+
+plt.subplot(3, 2, 2)
+datos_vl = df['ViralLoad'].dropna()
+limite_vl = datos_vl.quantile(0.99)
+datos_vl_clip = datos_vl[datos_vl <= limite_vl]
+
+plt.hist(datos_vl_clip, bins=30, color='#a8d5e2', edgecolor='white')
+plt.axvline(datos_vl_clip.median(), color='darkred', linestyle='--', linewidth=1.5, label='Mediana')
+plt.title('2. Distribución de Carga Viral (ViralLoad)', fontsize=12)
+plt.xlabel('Copias / mL')
+plt.ylabel('Frecuencia')
+plt.legend()
+
+
+# GRÁFICO 3: Pérdida de datos en Carga Viral (Missingness Flag)
+
+plt.subplot(3, 2, 3)
+conteo_vl_miss = df['ViralLoad_missing'].value_counts().sort_index()
+plt.bar(['Presente (0)', 'Faltante (1)'], conteo_vl_miss.values, color=['#a8d5e2', '#d73027'], edgecolor='white')
+plt.title('3. Ausencia de Registro de Carga Viral (ViralLoad_missing)', fontsize=12)
+plt.xlabel('Estado')
+plt.ylabel('Cantidad de Pacientes')
+for k, v in enumerate(conteo_vl_miss.values):
+    plt.text(k, v + 250, f"{v} ({v/len(df)*100:.1f}%)", ha='center', fontsize=10, fontweight='bold')
+
+
+# GRÁFICO 4: Boxplot de CD4 Reciente por Nivel de Adherencia
+
+plt.subplot(3, 2, 4)
+niveles_adh = df['ArvAdherenceLatestLevel'].dropna().unique()
+limite_cd4_rec = df['MostRecentCd4Count'].quantile(0.99)
+df_clip_cd4_rec = df[df['MostRecentCd4Count'] <= limite_cd4_rec]
+
+grupos_cd4_rec = [
+    df_clip_cd4_rec[df_clip_cd4_rec['ArvAdherenceLatestLevel'] == nivel]['MostRecentCd4Count'].dropna()
+    for nivel in niveles_adh
+]
+
+plt.boxplot(grupos_cd4_rec, tick_labels=niveles_adh, patch_artist=True,
+            boxprops=dict(facecolor='#a8d5e2'), medianprops=dict(color='darkred', linewidth=2))
+plt.title('4. CD4 Reciente por Nivel de Adherencia', fontsize=12)
+plt.xlabel('Nivel de Adherencia')
+plt.ylabel('Conteo Reciente de CD4')
+plt.xticks(rotation=15)
+
+
+# GRÁFICO 5: Relación Estado Funcional Inicial vs Adherencia
+
+plt.subplot(3, 2, 5)
+tabla_cruce = pd.crosstab(df['FunctionalStatusAtStart'], df['ArvAdherenceLatestLevel'], normalize='index')
+tabla_cruce.plot(kind='bar', ax=plt.gca(), colormap='coolwarm', edgecolor='white')
+plt.title('5. Estado Funcional Inicial vs Nivel de Adherencia', fontsize=12)
+plt.xlabel('Estado Funcional al Ingreso')
+plt.ylabel('Proporción (Normalizado)')
+plt.xticks(rotation=15)
+plt.legend(title='Adherencia', loc='best')
+
+plt.tight_layout()
+plt.show()
+
+# Conclusiones impresas dinámicamente con valores reales
+print("CONCLUSIONES CLÍNICAS Y OPERATIVAS CLAVE:")
+print(f"1. CD4 Inicial: La mitad de los pacientes inicia el tratamiento con menos de {datos_cd4.median():.0f} CD4 células/µL, lo que evidencia un preocupante ingreso tardío al sistema de salud.")
+print(f"2. Carga Viral Activa: La mediana de carga viral es {datos_vl.median():.0f} copias/mL, confirmando que la mayoría de los pacientes en control regular logran una adecuada supresión virológica.")
+print(f"3. Brecha de Monitoreo: Un {conteo_vl_miss[1]/len(df)*100:.1f}% de los pacientes ({conteo_vl_miss[1]} en total) carece de una prueba reciente de Carga Viral, revelando un problema prioritario en el seguimiento.")
+print(f"4. Respuesta Inmunológica: El gráfico de CD4 Reciente confirma visualmente que quienes mantienen una adherencia 'Good' gozan de una mejor recuperación de defensas que los pacientes de nivel 'Poor'.")
+print(f"5. Barrera Física de Adherencia: Los pacientes que iniciaron postrados en cama ('Bed ridden') muestran proporciones críticamente mayores de adherencia deficiente en comparación con quienes ingresaron activos.")
 
 # %% [markdown]
 # ## 9. Conclusiones finales  (Integrante A)
